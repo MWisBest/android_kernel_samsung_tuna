@@ -1622,18 +1622,6 @@ static const struct snd_soc_dapm_route intercon[] = {
 	{"AUXR", NULL, "Aux Right Playback"},
 };
 
-static int twl6040_add_widgets(struct snd_soc_codec *codec)
-{
-	struct snd_soc_dapm_context *dapm = &codec->dapm;
-
-	snd_soc_dapm_new_controls(dapm, twl6040_dapm_widgets,
-				 ARRAY_SIZE(twl6040_dapm_widgets));
-	snd_soc_dapm_add_routes(dapm, intercon, ARRAY_SIZE(intercon));
-	snd_soc_dapm_new_widgets(dapm);
-
-	return 0;
-}
-
 /* set of rates for each pll: low-power and high-performance */
 
 static unsigned int lp_rates[] = {
@@ -2032,10 +2020,6 @@ static int twl6040_probe(struct snd_soc_codec *codec)
 	if (ret)
 		goto bias_err;
 
-	snd_soc_add_controls(codec, twl6040_snd_controls,
-				ARRAY_SIZE(twl6040_snd_controls));
-	twl6040_add_widgets(codec);
-
 #ifdef CONFIG_SOUND_CONTROL
 	snd_data = priv;
 	snd_codec = codec;
@@ -2098,6 +2082,13 @@ static struct snd_soc_codec_driver soc_codec_dev_twl6040 = {
 	.reg_cache_size = ARRAY_SIZE(twl6040_reg),
 	.reg_word_size = sizeof(u8),
 	.reg_cache_default = twl6040_reg,
+
+	.controls = twl6040_snd_controls,
+	.num_controls = ARRAY_SIZE(twl6040_snd_controls),
+	.dapm_widgets = twl6040_dapm_widgets,
+	.num_dapm_widgets = ARRAY_SIZE(twl6040_dapm_widgets),
+	.dapm_routes = intercon,
+	.num_dapm_routes = ARRAY_SIZE(intercon),
 };
 
 static int __devinit twl6040_codec_probe(struct platform_device *pdev)
