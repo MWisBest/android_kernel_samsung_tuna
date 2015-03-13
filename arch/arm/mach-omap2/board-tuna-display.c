@@ -996,6 +996,13 @@ static void tuna_hdmi_mux_init(void)
 
 }
 
+#ifdef CONFIG_FB_OMAP2_NUM_FBS
+#define OMAPLFB_NUM_DEV CONFIG_FB_OMAP2_NUM_FBS
+#else
+#define OMAPLFB_NUM_DEV 2
+#endif
+
+#if OMAPLFB_NUM_DEV > 1
 static struct omap_dss_device tuna_hdmi_device = {
 	.name = "hdmi",
 	.driver_name = "hdmi_panel",
@@ -1013,10 +1020,13 @@ static struct omap_dss_device tuna_hdmi_device = {
 	.hpd_gpio = TUNA_GPIO_HDMI_HPD,
 	.channel = OMAP_DSS_CHANNEL_DIGIT,
 };
+#endif
 
 static struct omap_dss_device *tuna_dss_devices[] = {
 	&tuna_oled_device,
+#if OMAPLFB_NUM_DEV > 1
 	&tuna_hdmi_device,
+#endif
 };
 
 static struct omap_dss_board_info tuna_dss_data = {
