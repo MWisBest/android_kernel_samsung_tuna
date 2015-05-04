@@ -10,6 +10,7 @@
  *  32-bit debugging code
  */
 #include <linux/linkage.h>
+#include <asm/assembler.h>
 
 		.text
 
@@ -166,7 +167,7 @@ ENTRY(printascii)
 		ldrneb	r1, [r0], #1
 		teqne	r1, #0
 		bne	1b
-		mov	pc, lr
+		ret	lr
 ENDPROC(printascii)
 
 ENTRY(printch)

@@ -1,3 +1,5 @@
+#include <asm/assembler.h>
+
 #if __LINUX_ARM_ARCH__ >= 6
 	.macro	bitop, instr
 	ands	ip, r1, #3
@@ -12,7 +14,7 @@
 	strex	r0, r2, [r1]
 	cmp	r0, #0
 	bne	1b
-	bx	lr
+	ret	lr
 	.endm
 
 	.macro	testop, instr, store
@@ -33,7 +35,7 @@
 	smp_dmb
 	cmp	r0, #0
 	movne	r0, #1
-2:	bx	lr
+2:	ret	lr
 	.endm
 #else
 	.macro	bitop, instr
@@ -48,7 +50,7 @@
 	\instr	r2, r2, r3
 	str	r2, [r1, r0, lsl #2]
 	restore_irqs ip
-	mov	pc, lr
+	ret	lr
 	.endm
 
 /**
@@ -72,6 +74,6 @@
 	\store	r2, [r1]
 	moveq	r0, #0
 	restore_irqs ip
-	mov	pc, lr
+	ret	lr
 	.endm
 #endif

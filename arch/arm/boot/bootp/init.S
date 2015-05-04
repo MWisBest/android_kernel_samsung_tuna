@@ -16,6 +16,9 @@
  *  size immediately following the kernel, we could build this into
  *  a binary blob, and concatenate the zImage using the cat command.
  */
+
+#include <asm/assembly.h>
+
 		.section .start,#alloc,#execinstr
 		.type	_start, #function
 		.globl	_start
@@ -69,7 +72,7 @@ move:		ldmia	r4!, {r7 - r10}		@ move 32-bytes at a time
 		stmia	r5!, {r7 - r10}
 		subs	r6, r6, #8 * 4
 		bcs	move
-		mov	pc, lr
+		ret	lr
 
 		.size	_start, . - _start
 
