@@ -183,17 +183,20 @@ static void omap4_tuna_fixup_orientations_maguro(int revision)
 
 static void omap4_tuna_fixup_orientations_toro(int revision)
 {
-	pr_info("HW %d", revision);
-	if (revision >= 14) {
-		rotcpy(mpu_data.orientation, orientation_back_left_90);
-		rotcpy(mpu_data.accel.orientation, orientation_back);
+	/* mpu_data.orientation is the same for all revisions */
+	rotcpy(mpu_data.orientation, orientation_back_left_90);
+
+	/* mpu_data.accel.orientation is the same for >= 2;
+	 * as any boards in consumer hand should be at least rev 8,
+	 * default to this and let the extremely unlikely (if not
+	 * impossible) case of a rev 1 board take a hit. */
+	rotcpy(mpu_data.accel.orientation, orientation_back);
+
+	if (revision >= 14) { /* toroplus */
 		rotcpy(mpu_data.compass.orientation, orientation_back);
 	} else if (revision >= 2) {
-		rotcpy(mpu_data.orientation, orientation_back_left_90);
-		rotcpy(mpu_data.accel.orientation, orientation_back);
 		rotcpy(mpu_data.compass.orientation, orientation_back_180);
-	} else if (revision >= 1) {
-		rotcpy(mpu_data.orientation, orientation_back_left_90);
+	} else if (revision == 1) {
 		rotcpy(mpu_data.accel.orientation, orientation_back_180);
 		rotcpy(mpu_data.compass.orientation, orientation_back_left_90);
 	}
