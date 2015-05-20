@@ -53,7 +53,7 @@ static void tuna_oled_set_power(bool enable)
 		}
 	}
 
-	if (omap4_tuna_get_revision() >= 5) {
+	if (likely(omap4_tuna_get_revision() >= 5)) {
 		if (IS_ERR_OR_NULL(tuna_oled_reg_iovcc)) {
 			tuna_oled_reg_iovcc = regulator_get(NULL, "vlcd-iovcc");
 			if (IS_ERR_OR_NULL(tuna_oled_reg_iovcc)) {
@@ -1070,8 +1070,8 @@ void __init omap4_tuna_display_init(void)
 {
 	struct panel_s6e8aa0_data *panel;
 
-	if (omap4_tuna_get_revision() ==
-	    (omap4_tuna_get_type() == TUNA_TYPE_MAGURO ? 2 : 1)) {
+	if (likely(omap4_tuna_get_revision() ==
+	    (omap4_tuna_get_type() == TUNA_TYPE_MAGURO ? 2 : 1))) {
 		/*
 		 * Older devices were not calibrated the same way as newer
 		 * devices. These values are probably not correct, but the older
@@ -1080,7 +1080,7 @@ void __init omap4_tuna_display_init(void)
 		 * newer devices.
 		 */
 		tuna_oled_data_m3.factory_info = &tuna_oled_factory_info_m2t1;
-	} else if (omap4_tuna_get_revision() <= 1) {
+	} else if (unlikely(omap4_tuna_get_revision() <= 1)) {
 		tuna_oled_data_m3.factory_info = &tuna_oled_factory_info_old;
 	}
 

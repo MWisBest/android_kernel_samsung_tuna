@@ -197,7 +197,7 @@ static void omap4_tuna_init_hw_rev(void)
 		"Tuna HW revision: %02x (%s), cpu %s ES%d.%d ",
 		tuna_hw_rev,
 		omap4_tuna_hw_rev_name(),
-		cpu_is_omap443x() ? "OMAP4430" : "OMAP4460",
+		"OMAP4460",
 		(GET_OMAP_REVISION() >> 4) & 0xf,
 		GET_OMAP_REVISION() & 0xf);
 
@@ -284,7 +284,7 @@ static int uart1_rts_ctrl_write(struct file *file, const char __user *buffer,
 {
 	char buf[10] = {0,};
 
-	if (omap4_tuna_get_revision() < TUNA_REV_SAMPLE_4)
+	if (unlikely(omap4_tuna_get_revision() < TUNA_REV_SAMPLE_4))
 		return -ENXIO;
 	if (count > sizeof(buf) - 1)
 		return -EINVAL;
@@ -778,7 +778,7 @@ static void tuna_audio_init(void)
 
 	/* aud_pwron */
 	if (omap4_tuna_get_type() == TUNA_TYPE_TORO &&
-	    omap4_tuna_get_revision() >= 1)
+	    likely(omap4_tuna_get_revision() >= 1))
 		aud_pwron = GPIO_AUD_PWRON_TORO_V1;
 	else
 		aud_pwron = GPIO_AUD_PWRON;
@@ -1020,7 +1020,7 @@ static inline void __init board_serial_init(void)
 	struct omap_device_pad *uart1_pads;
 	int uart1_pads_sz;
 
-	if (omap4_tuna_get_revision() >= TUNA_REV_SAMPLE_4) {
+	if (likely(omap4_tuna_get_revision() >= TUNA_REV_SAMPLE_4)) {
 		uart1_pads = tuna_uart1_pads_sample4;
 		uart1_pads_sz = ARRAY_SIZE(tuna_uart1_pads_sample4);
 	} else {
@@ -1057,7 +1057,7 @@ static const struct flash_platform_data w25q80_pdata = {
 static struct omap2_mcspi_device_config f_rom_mcspi_config = {
 	.turbo_mode	= 0,
 	.single_channel	= 1,	/* 0: slave, 1: master */
-	.swap_datalines	= 1,
+	.swap_datalines	= 0,
 };
 
 static struct spi_board_info tuna_f_rom[] __initdata = {
@@ -1076,8 +1076,8 @@ static void tuna_from_init(void)
 {
 	int err;
 
-	if (tuna_hw_rev >= 0x07)
-		f_rom_mcspi_config.swap_datalines = 0;
+	if (unlikely(tuna_hw_rev < 0x07))
+		f_rom_mcspi_config.swap_datalines = 1;
 
 	err = spi_register_board_info(tuna_f_rom, ARRAY_SIZE(tuna_f_rom));
 	if (err)
@@ -1292,11 +1292,7 @@ static void tuna_power_off(void)
 
 static void __init tuna_init(void)
 {
-	int package = OMAP_PACKAGE_CBS;
-
-	if (omap_rev() == OMAP4430_REV_ES1_0)
-		package = OMAP_PACKAGE_CBL;
-	omap4_mux_init(board_mux, board_wkup_mux, package);
+	omap4_mux_init(board_mux, board_wkup_mux, OMAP_PACKAGE_CBS);
 
 	omap4_tuna_init_hw_rev();
 

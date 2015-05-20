@@ -241,7 +241,7 @@ static int __init omap4_tuna_vibrator_init(void)
 	if (!machine_is_tuna())
 		return 0;
 
-	vibdata.gpio_en = (omap4_tuna_get_revision() >= 5) ?
+	vibdata.gpio_en = (likely(omap4_tuna_get_revision() >= 5)) ?
 			GPIO_MOTOR_EN_REV05 : GPIO_MOTOR_EN;
 
 	omap_mux_init_gpio(vibdata.gpio_en, OMAP_PIN_OUTPUT |

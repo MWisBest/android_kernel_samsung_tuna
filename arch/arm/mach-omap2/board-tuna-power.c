@@ -489,18 +489,6 @@ void __init omap4_tuna_power_init(void)
 				OMAP_PIN_OFF_OUTPUT_HIGH, -1);
 	if (status)
 		pr_err("TPS62361 initialization failed: %d\n", status);
-	/*
-	 * Some Tuna devices have a 4430 chip on a 4460 board, manually
-	 * tweak the power tree to the 4460 style with the TPS regulator.
-	 */
-	if (cpu_is_omap443x()) {
-		/* Disable 4430 mapping */
-		omap_twl_pmic_update("mpu", CHIP_IS_OMAP443X, 0x0);
-		omap_twl_pmic_update("core", CHIP_IS_OMAP443X, 0x0);
-		/* make 4460 map usable for 4430 */
-		omap_twl_pmic_update("core", CHIP_IS_OMAP446X, CHIP_IS_OMAP443X);
-		omap_tps6236x_update("mpu", CHIP_IS_OMAP446X, CHIP_IS_OMAP443X);
-	}
 
 	/* Update temperature data from board type */
 	if (omap4_tuna_get_type() == TUNA_TYPE_TORO) {
@@ -514,17 +502,7 @@ void __init omap4_tuna_power_init(void)
 	}
 
 	/* Update oscillator information */
-	if (omap4_tuna_get_revision() <= 0x3) {
-		/*
-		 * until sample 4 (Toro and Maguro), we used KC2520B38:
-		 * ST = 10ms
-		 * Output Disable time = 100ns
-		 * Output enable time = 5ms
-		 * tstart = 10ms + 5ms = 15ms.
-		 * tshut = 1us (rounded)
-		 */
-		omap_pm_set_osc_lp_time(15000, 1);
-	} else {
+	if (likely(omap4_tuna_get_revision() > TUNA_REV_SAMPLE_4)) {
 		/*
 		 * sample 5 onwards (Toro and Maguro), we use SQ200384:
 		 * ST = 10ms
@@ -534,6 +512,16 @@ void __init omap4_tuna_power_init(void)
 		 * tshut = 1us (rounded)
 		 */
 		omap_pm_set_osc_lp_time(20000, 1);
+	} else {
+		/*
+		 * until sample 4 (Toro and Maguro), we used KC2520B38:
+		 * ST = 10ms
+		 * Output Disable time = 100ns
+		 * Output enable time = 5ms
+		 * tstart = 10ms + 5ms = 15ms.
+		 * tshut = 1us (rounded)
+		 */
+		omap_pm_set_osc_lp_time(15000, 1);
 	}
 
 	omap_mux_init_gpio(charger_gpios[0].gpio, OMAP_PIN_INPUT);

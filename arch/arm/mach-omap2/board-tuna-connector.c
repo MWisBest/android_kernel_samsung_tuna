@@ -212,7 +212,7 @@ static void tuna_fsa3200_mux_pair(int state)
 
 static void tuna_mux_usb_to_fsa(bool enable)
 {
-	if (omap4_tuna_get_revision() >= 3) {
+	if (likely(omap4_tuna_get_revision() >= TUNA_REV_SAMPLE_4)) {
 		tuna_fsa3200_mux_pair(enable ? TUNA_USB_MUX_FSA :
 				TUNA_USB_MUX_DEFAULT);
 	} else {
@@ -229,7 +229,7 @@ static void tuna_mux_usb_to_fsa(bool enable)
 
 static void tuna_mux_usb_to_mhl(bool enable)
 {
-	if (omap4_tuna_get_revision() >= 3) {
+	if (likely(omap4_tuna_get_revision() >= TUNA_REV_SAMPLE_4)) {
 		tuna_fsa3200_mux_pair(enable ? TUNA_USB_MUX_MHL :
 				TUNA_USB_MUX_DEFAULT);
 	} else {
@@ -285,7 +285,7 @@ static void tuna_ap_usb_attach(struct tuna_otg *tuna_otg)
 {
 	tuna_vusb_enable(tuna_otg, true);
 
-	if (omap4_tuna_get_revision() >= 3) {
+	if (likely(omap4_tuna_get_revision() >= TUNA_REV_SAMPLE_4)) {
 		tuna_fsa3200_mux_pair(TUNA_USB_MUX_AP);
 	} else {
 		tuna_mux_usb(TUNA_USB_MUX_AP);
@@ -441,7 +441,7 @@ static void tuna_fsa_usb_detected(int device)
 	case FSA9480_DETECT_USB_HOST:
 		tuna_vusb_enable(tuna_otg, true);
 
-		if (omap4_tuna_get_revision() >= 3) {
+		if (likely(omap4_tuna_get_revision() >= TUNA_REV_SAMPLE_4)) {
 			tuna_fsa3200_mux_pair(TUNA_USB_MUX_AP);
 		} else {
 			tuna_mux_usb(TUNA_USB_MUX_AP);
@@ -893,7 +893,7 @@ int __init omap4_tuna_connector_init(void)
 	struct tuna_otg *tuna_otg = &tuna_otg_xceiv;
 	int ret;
 
-	if (omap4_tuna_get_revision() >= 3) {
+	if (likely(omap4_tuna_get_revision() >= TUNA_REV_SAMPLE_4)) {
 		gpio_request(GPIO_MHL_SEL, "fsa3200_mhl_sel");
 		gpio_request(GPIO_AP_SEL, "fsa3200_ap_sel");
 
