@@ -301,7 +301,7 @@ CONFIG_OMAP_REMOTEPROC_MEMPOOL_SIZE=0x0
 # CONFIG_OMAP_PM_NONE is not set
 # CONFIG_OMAP_PM_NOOP is not set
 CONFIG_OMAP_PM=y
-CONFIG_ION_OMAP_TILER2D_SIZE=74
+CONFIG_ION_OMAP_TILER2D_SIZE=66
 
 #
 # TI OMAP2/3/4 Specific Features
@@ -467,7 +467,7 @@ CONFIG_ARM_FLUSH_CONSOLE_ON_RESTART=y
 # CONFIG_USE_OF is not set
 CONFIG_ZBOOT_ROM_TEXT=0
 CONFIG_ZBOOT_ROM_BSS=0
-CONFIG_CMDLINE="console=ttyFIQ0 androidboot.console=ttyFIQ0 mem=1G omap_wdt.timer_margin=30 no_console_suspend androidboot.selinux=permissive selinux=0"
+CONFIG_CMDLINE="console=ttyFIQ0 androidboot.console=ttyFIQ0 mem=1G vmalloc=384M omap_wdt.timer_margin=30 no_console_suspend androidboot.selinux=permissive selinux=0"
 # CONFIG_CMDLINE_FROM_BOOTLOADER is not set
 CONFIG_CMDLINE_EXTEND=y
 # CONFIG_CMDLINE_FORCE is not set
@@ -1165,6 +1165,8 @@ CONFIG_LTE_MODEM_CMC221=y
 # CONFIG_GCCORE is not set
 # CONFIG_CACHE2DMANAGER is not set
 CONFIG_COLOR_CONTROL=y
+CONFIG_CUSTOM_VOLTAGE=y
+CONFIG_SOUND_CONTROL=y
 CONFIG_HAVE_IDE=y
 # CONFIG_IDE is not set
 
