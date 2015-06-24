@@ -599,17 +599,17 @@ config COLOR_CONTROL
 	bool "Support for Color Control"
 	default n
 	help
-	  Say Y here to enable Color Control<<<<<<< HEAD
+	  Say Y here to enable Color Control
 
 config CUSTOM_VOLTAGE
 	bool "Support for Custom Voltage"
-	default y
+	default n
 	help
 	  Say Y here to enable Custom Voltage
 
 config SOUND_CONTROL
 	bool "Enable support for Sound Control"
-	default y
+	default n
 	help
 	  Enable support for Sound Control
 
