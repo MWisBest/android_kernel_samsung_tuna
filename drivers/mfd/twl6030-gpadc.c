@@ -867,7 +867,7 @@ int twl6030_get_gpadc_conversion(int channel_no)
 	if (ret < 0)
 		return ret;
 
-	if (req.rbuf[channel_no] > 0)
+	if (req.buf[channel_no].raw_channel_value > 0)
 		temp = req.buf[channel_no].raw_code;
 
 	return temp;
@@ -1377,6 +1377,12 @@ static int __devinit twl6030_gpadc_probe(struct platform_device *pdev)
 	platform_set_drvdata(pdev, gpadc);
 	mutex_init(&gpadc->lock);
 	INIT_WORK(&gpadc->ws, twl6030_gpadc_work);
+
+#ifdef CONFIG_MACH_TUNA
+	/* Enables reading of values from channel 2 */
+	twl6030_gpadc_write(gpadc, TWL6030_GPADC_CTRL,
+						TWL6030_GPADC_CTRL_SCALER_EN);
+#endif
 
 	if (gpadc->features & TWL6032_SUBCLASS)
 		ret = twl6032_calibration(gpadc);
