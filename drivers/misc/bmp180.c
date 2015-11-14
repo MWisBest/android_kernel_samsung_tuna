@@ -78,7 +78,7 @@
 #define BMP180_EEPROM_MD_U	0xbe
 #define BMP180_EEPROM_MD_L	0xbf
 
-#define I2C_TRIES		5
+#define I2C_TRIES		10
 #define AUTO_INCREMENT		0x80
 
 #define DELAY_LOWBOUND		(50 * NSEC_PER_MSEC)
@@ -122,6 +122,7 @@ static int bmp180_i2c_read(const struct i2c_client *client, u8 cmd,
 		err = i2c_smbus_read_i2c_block_data(client, cmd, len, buf);
 		if (err == len)
 			return 0;
+		pr_info("%s: tries: %i\n", __func__, tries);
 	} while (++tries < I2C_TRIES);
 
 	return err;
@@ -339,20 +340,32 @@ static int bmp180_read_store_eeprom_val(struct bmp180_data *barom)
 	err = bmp180_i2c_read(barom->client, BMP180_EEPROM_AC1_U,
 				(u8 *)buf, 22);
 	if (err) {
-		pr_err("%s: Cannot read EEPROM values\n", __func__);
-		return err;
+		pr_err("%s: Cannot read EEPROM values! Using fallbacks.\n", __func__);
+		barom->bmp180_eeprom_vals.AC1 = 7240;
+		barom->bmp180_eeprom_vals.AC2 = -1135;
+		barom->bmp180_eeprom_vals.AC3 = -15024;
+		barom->bmp180_eeprom_vals.AC4 = 33342;
+		barom->bmp180_eeprom_vals.AC5 = 24351;
+		barom->bmp180_eeprom_vals.AC6 = 18871;
+		barom->bmp180_eeprom_vals.B1 = 5498;
+		barom->bmp180_eeprom_vals.B2 = 60;
+		barom->bmp180_eeprom_vals.MB = -32768;
+		barom->bmp180_eeprom_vals.MC = -11075;
+		barom->bmp180_eeprom_vals.MD = 2432;
+	} else {
+		barom->bmp180_eeprom_vals.AC1 = be16_to_cpu(buf[0]);
+		barom->bmp180_eeprom_vals.AC2 = be16_to_cpu(buf[1]);
+		barom->bmp180_eeprom_vals.AC3 = be16_to_cpu(buf[2]);
+		barom->bmp180_eeprom_vals.AC4 = be16_to_cpu(buf[3]);
+		barom->bmp180_eeprom_vals.AC5 = be16_to_cpu(buf[4]);
+		barom->bmp180_eeprom_vals.AC6 = be16_to_cpu(buf[5]);
+		barom->bmp180_eeprom_vals.B1 = be16_to_cpu(buf[6]);
+		barom->bmp180_eeprom_vals.B2 = be16_to_cpu(buf[7]);
+		barom->bmp180_eeprom_vals.MB = be16_to_cpu(buf[8]);
+		barom->bmp180_eeprom_vals.MC = be16_to_cpu(buf[9]);
+		barom->bmp180_eeprom_vals.MD = be16_to_cpu(buf[10]);
 	}
-	barom->bmp180_eeprom_vals.AC1 = be16_to_cpu(buf[0]);
-	barom->bmp180_eeprom_vals.AC2 = be16_to_cpu(buf[1]);
-	barom->bmp180_eeprom_vals.AC3 = be16_to_cpu(buf[2]);
-	barom->bmp180_eeprom_vals.AC4 = be16_to_cpu(buf[3]);
-	barom->bmp180_eeprom_vals.AC5 = be16_to_cpu(buf[4]);
-	barom->bmp180_eeprom_vals.AC6 = be16_to_cpu(buf[5]);
-	barom->bmp180_eeprom_vals.B1 = be16_to_cpu(buf[6]);
-	barom->bmp180_eeprom_vals.B2 = be16_to_cpu(buf[7]);
-	barom->bmp180_eeprom_vals.MB = be16_to_cpu(buf[8]);
-	barom->bmp180_eeprom_vals.MC = be16_to_cpu(buf[9]);
-	barom->bmp180_eeprom_vals.MD = be16_to_cpu(buf[10]);
+
 	return 0;
 }
 
